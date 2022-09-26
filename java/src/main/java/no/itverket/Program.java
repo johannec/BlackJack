@@ -7,21 +7,39 @@ import java.util.Scanner;
 public class Program {
     public static void main(String[] args) {
         final Deck deck = new Deck();
-        final List<Card> hand = new ArrayList<>();
+        Hand hand = new Hand();
+        boolean bust = false;
+        boolean stopProgram = false;
 
         final Scanner scanner = new Scanner(System.in);
-        while (true) {
+
+        while (!bust && !stopProgram) {
             System.out.println("Stand, Hit");
             final String read = scanner.nextLine();
 
-            if (read.equals("Hit")) {
-                final Card card = deck.cards.remove();
-                hand.add(card);
-                final int total = hand.stream().map(x -> Math.min(x.rank, 10)).reduce(0, Integer::sum);
-                System.out.println(String.format("Hit with %s %s. Total is %s", card.suit, card.rank, total));
-            } else if (read.equals("Stand")) {
-                break;
+            switch (read) {
+                case "Hit":
+                case "hit":
+                case "h":
+                    hit(deck, hand);
+                    break;
+                case "Stand":
+                case "stand":
+                case "s":
+                    stopProgram = true;
+                    break;
             }
+
+            bust = hand.isBust();
         }
+    }
+
+
+
+    public static void hit(Deck deck, Hand hand) {
+        final Card card = deck.cards.remove(0);
+        hand.cardsOnHand.add(card);
+        hand.totalValue = hand.cardsOnHand.stream().map(x -> Math.min(x.rank, 10)).reduce(0, Integer::sum);
+        System.out.println(String.format("Hit with %s %s. Total is %s", card.suit, card.rank, hand.totalValue));
     }
 }
